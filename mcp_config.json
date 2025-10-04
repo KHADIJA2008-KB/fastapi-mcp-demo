@@ -1,0 +1,41 @@
+{
+  "mcpServers": {
+    "fastapi-mcp": {
+      "url": "http://localhost:8000",
+      "tools": [
+        {
+          "name": "hello",
+          "endpoint": "/tools/hello",
+          "method": "GET",
+          "description": "Returns a greeting message",
+          "parameters": {
+            "name": {
+              "type": "string",
+              "description": "Name to greet",
+              "default": "Student"
+            }
+          }
+        },
+        {
+          "name": "add",
+          "endpoint": "/tools/add",
+          "method": "GET",
+          "description": "Adds two numbers",
+          "parameters": {
+            "a": {
+              "type": "integer",
+              "description": "First number",
+              "required": true
+            },
+            "b": {
+              "type": "integer",
+              "description": "Second number",
+              "required": true
+            }
+          }
+        }
+      ]
+    }
+  }
+}
+
