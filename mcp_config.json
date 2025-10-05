@@ -2,12 +2,13 @@
   "mcpServers": {
     "fastapi-mcp": {
       "url": "http://localhost:8000",
+      "description": "FastAPI MCP Server with multiple utility tools",
       "tools": [
         {
           "name": "hello",
           "endpoint": "/tools/hello",
           "method": "GET",
-          "description": "Returns a greeting message",
+          "description": "Returns a personalized greeting message with timestamp",
           "parameters": {
             "name": {
               "type": "string",
@@ -20,7 +21,7 @@
           "name": "add",
           "endpoint": "/tools/add",
           "method": "GET",
-          "description": "Adds two numbers",
+          "description": "Adds two numbers and returns the result",
           "parameters": {
             "a": {
               "type": "integer",
@@ -33,9 +34,65 @@
               "required": true
             }
           }
+        },
+        {
+          "name": "multiply",
+          "endpoint": "/tools/multiply",
+          "method": "GET",
+          "description": "Multiplies two numbers",
+          "parameters": {
+            "a": {
+              "type": "number",
+              "description": "First number",
+              "required": true
+            },
+            "b": {
+              "type": "number",
+              "description": "Second number",
+              "required": true
+            }
+          }
+        },
+        {
+          "name": "temp-convert",
+          "endpoint": "/tools/temp-convert",
+          "method": "GET",
+          "description": "Converts temperature from Celsius to Fahrenheit and Kelvin",
+          "parameters": {
+            "celsius": {
+              "type": "number",
+              "description": "Temperature in Celsius",
+              "required": true
+            }
+          }
+        },
+        {
+          "name": "analyze-text",
+          "endpoint": "/tools/analyze-text",
+          "method": "GET",
+          "description": "Analyzes text and returns character/word statistics",
+          "parameters": {
+            "text": {
+              "type": "string",
+              "description": "Text to analyze",
+              "required": true
+            }
+          }
+        },
+        {
+          "name": "sqrt",
+          "endpoint": "/tools/sqrt",
+          "method": "GET",
+          "description": "Calculates the square root of a number",
+          "parameters": {
+            "number": {
+              "type": "number",
+              "description": "Number to calculate square root of",
+              "required": true
+            }
+          }
         }
       ]
     }
   }
 }
-

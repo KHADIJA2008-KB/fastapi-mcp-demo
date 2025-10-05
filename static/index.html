@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FastAPI MCP Server - Sample App</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 3em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .tool-card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .tool-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+        }
+
+        .tool-card h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.5em;
+        }
+
+        .tool-card p {
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .input-group input,
+        .input-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+
+        .input-group input:focus,
+        .input-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 12px 25px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .btn:hover {
+            transform: scale(1.02);
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f5f5f5;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+            display: none;
+        }
+
+        .result.show {
+            display: block;
+            animation: slideIn 0.3s;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .result pre {
+            background: white;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            color: #333;
+        }
+
+        .footer {
+            text-align: center;
+            color: white;
+            margin-top: 50px;
+            opacity: 0.8;
+        }
+
+        .mcp-info {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .mcp-info h2 {
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        .mcp-info ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .mcp-info li {
+            padding: 10px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .mcp-info li:before {
+            content: "✓ ";
+            color: #667eea;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            margin-top: 10px;
+            color: #667eea;
+        }
+
+        .loading.show {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 FastAPI MCP Server</h1>
+            <p>Sample Application with 6 MCP Tools</p>
+        </div>
+
+        <div class="mcp-info">
+            <h2>📋 About This MCP Server</h2>
+            <ul>
+                <li>Model Context Protocol (MCP) Server built with FastAPI</li>
+                <li>6 Interactive Tools available via HTTP API</li>
+                <li>Can be integrated with AI assistants like Gemini CLI</li>
+                <li>All tools documented at <a href="/docs">/docs</a></li>
+            </ul>
+        </div>
+
+        <div class="tools-grid">
+            <!-- Tool 1: Hello -->
+            <div class="tool-card">
+                <h3>👋 Hello Tool</h3>
+                <p>Get a personalized greeting with timestamp</p>
+                <div class="input-group">
+                    <label for="hello-name">Your Name:</label>
+                    <input type="text" id="hello-name" placeholder="Enter your name" value="Student">
+                </div>
+                <button class="btn" onclick="callHello()">Say Hello</button>
+                <div class="loading" id="hello-loading">⏳ Loading...</div>
+                <div class="result" id="hello-result"></div>
+            </div>
+
+            <!-- Tool 2: Add -->
+            <div class="tool-card">
+                <h3>➕ Addition Calculator</h3>
+                <p>Add two numbers together</p>
+                <div class="input-group">
+                    <label for="add-a">First Number:</label>
+                    <input type="number" id="add-a" placeholder="Enter first number" value="25">
+                </div>
+                <div class="input-group">
+                    <label for="add-b">Second Number:</label>
+                    <input type="number" id="add-b" placeholder="Enter second number" value="75">
+                </div>
+                <button class="btn" onclick="callAdd()">Calculate Sum</button>
+                <div class="loading" id="add-loading">⏳ Loading...</div>
+                <div class="result" id="add-result"></div>
+            </div>
+
+            <!-- Tool 3: Multiply -->
+            <div class="tool-card">
+                <h3>✖️ Multiplication Calculator</h3>
+                <p>Multiply two numbers</p>
+                <div class="input-group">
+                    <label for="mult-a">First Number:</label>
+                    <input type="number" id="mult-a" placeholder="Enter first number" value="12" step="0.1">
+                </div>
+                <div class="input-group">
+                    <label for="mult-b">Second Number:</label>
+                    <input type="number" id="mult-b" placeholder="Enter second number" value="8" step="0.1">
+                </div>
+                <button class="btn" onclick="callMultiply()">Calculate Product</button>
+                <div class="loading" id="mult-loading">⏳ Loading...</div>
+                <div class="result" id="mult-result"></div>
+            </div>
+
+            <!-- Tool 4: Temperature -->
+            <div class="tool-card">
+                <h3>🌡️ Temperature Converter</h3>
+                <p>Convert Celsius to Fahrenheit & Kelvin</p>
+                <div class="input-group">
+                    <label for="temp-celsius">Temperature (°C):</label>
+                    <input type="number" id="temp-celsius" placeholder="Enter temperature" value="25" step="0.1">
+                </div>
+                <button class="btn" onclick="callTemp()">Convert Temperature</button>
+                <div class="loading" id="temp-loading">⏳ Loading...</div>
+                <div class="result" id="temp-result"></div>
+            </div>
+
+            <!-- Tool 5: Text Analyzer -->
+            <div class="tool-card">
+                <h3>📝 Text Analyzer</h3>
+                <p>Analyze text statistics</p>
+                <div class="input-group">
+                    <label for="text-input">Enter Text:</label>
+                    <textarea id="text-input" rows="3" placeholder="Enter text to analyze">Hello World 123</textarea>
+                </div>
+                <button class="btn" onclick="callAnalyze()">Analyze Text</button>
+                <div class="loading" id="analyze-loading">⏳ Loading...</div>
+                <div class="result" id="analyze-result"></div>
+            </div>
+
+            <!-- Tool 6: Square Root -->
+            <div class="tool-card">
+                <h3>√ Square Root Calculator</h3>
+                <p>Calculate the square root of a number</p>
+                <div class="input-group">
+                    <label for="sqrt-number">Number:</label>
+                    <input type="number" id="sqrt-number" placeholder="Enter a number" value="144" step="0.01">
+                </div>
+                <button class="btn" onclick="callSqrt()">Calculate √</button>
+                <div class="loading" id="sqrt-loading">⏳ Loading...</div>
+                <div class="result" id="sqrt-result"></div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>Built with FastAPI | Model Context Protocol (MCP) Server</p>
+            <p>API Documentation: <a href="/docs" style="color: white; text-decoration: underline;">/docs</a></p>
+        </div>
+    </div>
+
+    <script>
+        const BASE_URL = '';
+
+        function showLoading(tool) {
+            document.getElementById(`${tool}-loading`).classList.add('show');
+            document.getElementById(`${tool}-result`).classList.remove('show');
+        }
+
+        function hideLoading(tool) {
+            document.getElementById(`${tool}-loading`).classList.remove('show');
+        }
+
+        function showResult(tool, data) {
+            hideLoading(tool);
+            const resultDiv = document.getElementById(`${tool}-result`);
+            resultDiv.innerHTML = '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
+            resultDiv.classList.add('show');
+        }
+
+        async function callHello() {
+            const name = document.getElementById('hello-name').value || 'Student';
+            showLoading('hello');
+            try {
+                const response = await fetch(`${BASE_URL}/tools/hello?name=${encodeURIComponent(name)}`);
+                const data = await response.json();
+                showResult('hello', data);
+            } catch (error) {
+                showResult('hello', { error: 'Failed to call tool: ' + error.message });
+            }
+        }
+
+        async function callAdd() {
+            const a = document.getElementById('add-a').value;
+            const b = document.getElementById('add-b').value;
+            showLoading('add');
+            try {
+                const response = await fetch(`${BASE_URL}/tools/add?a=${a}&b=${b}`);
+                const data = await response.json();
+                showResult('add', data);
+            } catch (error) {
+                showResult('add', { error: 'Failed to call tool: ' + error.message });
+            }
+        }
+
+        async function callMultiply() {
+            const a = document.getElementById('mult-a').value;
+            const b = document.getElementById('mult-b').value;
+            showLoading('mult');
+            try {
+                const response = await fetch(`${BASE_URL}/tools/multiply?a=${a}&b=${b}`);
+                const data = await response.json();
+                showResult('mult', data);
+            } catch (error) {
+                showResult('mult', { error: 'Failed to call tool: ' + error.message });
+            }
+        }
+
+        async function callTemp() {
+            const celsius = document.getElementById('temp-celsius').value;
+            showLoading('temp');
+            try {
+                const response = await fetch(`${BASE_URL}/tools/temp-convert?celsius=${celsius}`);
+                const data = await response.json();
+                showResult('temp', data);
+            } catch (error) {
+                showResult('temp', { error: 'Failed to call tool: ' + error.message });
+            }
+        }
+
+        async function callAnalyze() {
+            const text = document.getElementById('text-input').value;
+            showLoading('analyze');
+            try {
+                const response = await fetch(`${BASE_URL}/tools/analyze-text?text=${encodeURIComponent(text)}`);
+                const data = await response.json();
+                showResult('analyze', data);
+            } catch (error) {
+                showResult('analyze', { error: 'Failed to call tool: ' + error.message });
+            }
+        }
+
+        async function callSqrt() {
+            const number = document.getElementById('sqrt-number').value;
+            showLoading('sqrt');
+            try {
+                const response = await fetch(`${BASE_URL}/tools/sqrt?number=${number}`);
+                const data = await response.json();
+                showResult('sqrt', data);
+            } catch (error) {
+                showResult('sqrt', { error: 'Failed to call tool: ' + error.message });
+            }
+        }
+    </script>
+</body>
+</html>
+
